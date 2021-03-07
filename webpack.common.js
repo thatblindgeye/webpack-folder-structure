@@ -2,6 +2,22 @@ const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
+// use for multiple html files and to create output folder structure
+// replace plugins in module.exports with "plugins: HtmlPluginEntries"
+// const entries = {
+//   app: ["/scripts/index.js", "/stylesheets/main.css"],
+// };
+
+// const HtmlPluginEntries = Object.keys(entries).map(entryName => {
+//   return new HtmlWebpackPlugin({
+//     template: `/${entryName}/template.html`,
+//     filename: `${entryName}/index.html`,
+//     chunks: [entryName],
+//     inject: "body",
+//     minify: false,
+//   });
+// });
+
 module.exports = {
   context: path.resolve(__dirname, 'src'),
   entry: {

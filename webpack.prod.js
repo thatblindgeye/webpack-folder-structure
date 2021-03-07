@@ -1,8 +1,8 @@
 const { merge } = require('webpack-merge');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const common = require('./webpack.common.js');
 
 module.exports = merge(common, {
@@ -53,6 +53,9 @@ module.exports = merge(common, {
         },
         minimizerOptions: {
           plugins: [
+            // Use for lossy
+            // ['mozjpeg', { progressive: false }],
+            // ['pngquant', { quality: [75] }],
             ['jpegtran', { progressive: true }],
             ['optipng', { optimizationLevel: 5 }],
             ['gif2webp', { quality: 80, minimize: true, method: 5 }],
@@ -60,7 +63,7 @@ module.exports = merge(common, {
         },
       }),
       new ImageMinimizerPlugin({
-        // Only apply to files under 8192
+        // Only apply to files under 8192 bytes
         filter: (source) => {
           if (source.byteLength < 8192) {
             return true;
@@ -69,9 +72,12 @@ module.exports = merge(common, {
         },
         minimizerOptions: {
           plugins: [
+            // Use for lossy
+            // ['mozjpeg', { progressive: false }],
+            // ['pngquant', { quality: [90] }],
             ['jpegtran', { progressive: false }],
-            ['optipng', { optimizationLevel: 3 }],
-            ['gif2webp', { quality: 100, minimize: false, method: 3 }],
+            ['optipng', { optimizationLevel: 1 }],
+            ['gif2webp', { quality: 90, minimize: false, method: 3 }],
           ],
         },
       }),
@@ -79,7 +85,15 @@ module.exports = merge(common, {
         // Apply to all files
         minimizerOptions: {
           plugins: [
-            ['svgo', {}],
+            [
+              'svgo',
+              {
+                plugins: [
+                  {name: "removeComments", active: true},
+                  {name: "mergePaths", active: true},
+                ],
+              },
+            ],
           ],
         },
       }),

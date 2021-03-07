@@ -1,4 +1,4 @@
-# Webpack Folder Structure
+# Project Name
 
 ## Description
 
@@ -8,4 +8,4 @@ This is just my folder structure template for projects utilizing webpack. Whatev
 
 ### How-To
 
-## Issues During Creation
+## Issues During Creation/Misc. Notes

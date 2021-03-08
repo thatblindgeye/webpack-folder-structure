@@ -5,6 +5,7 @@
   "main": "index.js",
   "browserslist": [
     "> 1%",
+    "ie >= 8",
     "edge >= 15",
     "ff >= 45",
     "chrome >= 45",
@@ -53,7 +54,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npx eslint ."
+      "pre-commit": "npx eslint ./src/."
     }
   }
 }

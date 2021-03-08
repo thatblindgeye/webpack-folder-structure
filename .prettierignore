@@ -1,5 +1,5 @@
 node_modules/
 ignore/
 dist/
-webpack.*.js
-*.config.js
+# webpack.*.js
+# *.config.js

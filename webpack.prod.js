@@ -1,45 +1,80 @@
+const path = require('path');
+const common = require('./webpack.common.js');
 const { merge } = require('webpack-merge');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const ImageMinimizerPlugin = require('image-minimizer-webpack-plugin');
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const common = require('./webpack.common.js');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = merge(common, {
   mode: 'production',
   output: {
-    filename: "[name].[contenthash].js",
+    path: path.resolve(__dirname, 'dist'),
+    filename: '[name].[contenthash:15].js',
+    assetModuleFilename: '[path][name].[contenthash:15][ext]',
+  },
+  module: {
+    rules: [
+      {
+        test: /\.s?[ac]ss$/i,
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              publicPath: '',
+            },
+          },
+          {
+            loader: 'css-loader',
+            options: {
+              importLoaders: 1,
+            },
+          },
+          {
+            loader: 'postcss-loader',
+          },
+        ],
+      },
+      {
+        // revert to "type: asset/resource" with svg added
+        // if file-loader stops working
+        test: /\.(png|jpe?g|svg|gif)$/i,
+        use: {
+          loader: 'file-loader',
+          options: {
+            esModule: false,
+            name: '[path][name].[contenthash:15].[ext]',
+          },
+        },
+        type: 'javascript/auto',
+      },
+      {
+        test: /\.(woff|woff2|eot|ttf|otf)$/i,
+        type: 'asset/resource',
+      },
+    ],
   },
   plugins: [
+    new HtmlWebpackPlugin({
+      template: '/template.html',
+      filename: 'index.[contenthash:15].html',
+      inject: 'body',
+      minify: true,
+      // links html to entry
+      chunks: ['app'],
+    }),
     new MiniCssExtractPlugin({
-      filename: "style-[name].[contenthash].css",
-      chunkFilename: 'style-[name].[contenthash].css',
+      filename: 'style-[name].[contenthash:15].css',
+      chunkFilename: 'style-[name].[contenthash:15].css',
     }),
     new CleanWebpackPlugin({
       cleanAfterEveryBuildPatterns: ['dist/'],
       dry: false,
     }),
   ],
-  module: {
-    rules: [
-      {
-        test: /\.(png|svg|jpg|jpeg|gif)$/i,
-        type: 'asset/resource',
-        generator: {
-          filename: '[path][name].[contenthash:10][ext]',
-        },
-      },
-      {
-        test: /\/fonts\/.*\.(woff|woff2|eot|ttf|otf)$/i,
-        type: 'asset/resource',
-        generator: {
-          filename: '[path][name].[contenthash:10][ext]',
-        },
-      },
-    ],
-  },
   optimization: {
-    minimize: true,
+    moduleIds: 'deterministic',
     minimizer: [
       `...`,
       new CssMinimizerPlugin(),
@@ -53,12 +88,9 @@ module.exports = merge(common, {
         },
         minimizerOptions: {
           plugins: [
-            // Use for lossy
-            // ['mozjpeg', { progressive: false }],
-            // ['pngquant', { quality: [75] }],
-            ['jpegtran', { progressive: true }],
-            ['optipng', { optimizationLevel: 5 }],
-            ['gif2webp', { quality: 80, minimize: true, method: 5 }],
+            ['mozjpeg', { progressive: true, quality: 25 }],
+            ['pngquant', { quality: [0.5, 0.7] }],
+            ['svgo', {}],
           ],
         },
       }),
@@ -72,28 +104,8 @@ module.exports = merge(common, {
         },
         minimizerOptions: {
           plugins: [
-            // Use for lossy
-            // ['mozjpeg', { progressive: false }],
-            // ['pngquant', { quality: [90] }],
-            ['jpegtran', { progressive: false }],
-            ['optipng', { optimizationLevel: 1 }],
-            ['gif2webp', { quality: 90, minimize: false, method: 3 }],
-          ],
-        },
-      }),
-      new ImageMinimizerPlugin({
-        // Apply to all files
-        minimizerOptions: {
-          plugins: [
-            [
-              'svgo',
-              {
-                plugins: [
-                  {name: "removeComments", active: true},
-                  {name: "mergePaths", active: true},
-                ],
-              },
-            ],
+            ['mozjpeg', { progressive: false, quality: 75 }],
+            ['pngquant', { quality: [0.6, 0.8] }],
           ],
         },
       }),
@@ -106,15 +118,15 @@ module.exports = merge(common, {
           test: /[\\/]node_modules[\\/]/,
           name: 'vendors',
           chunks: 'all',
-          enforce: true
+          enforce: true,
         },
         normalizeCSS: {
           test: /normalize\.s?css$/,
           name: 'normalize',
           chunks: 'all',
-          enforce: true
-        }
-      }
+          enforce: true,
+        },
+      },
     },
   },
 });

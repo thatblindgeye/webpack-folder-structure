@@ -18,7 +18,7 @@ const siteStorage = (() => {
   const saveToLocal = () => {
     localStorage.setItem(
       'theme',
-      document.documentElement.getAttribute('theme')
+      document.documentElement.getAttribute('data-theme')
     );
 
     localStorage.setItem(
@@ -47,7 +47,7 @@ const displayOptions = (() => {
   };
 
   const _toggleTheme = (e) => {
-    if (document.documentElement.getAttribute('theme') === 'light') {
+    if (document.documentElement.getAttribute('data-theme') === 'light') {
       _darkTheme();
     } else {
       _lightTheme();
@@ -57,13 +57,13 @@ const displayOptions = (() => {
 
   const _darkTheme = () => {
     header.themeSwitch.setAttribute('aria-checked', 'false');
-    document.documentElement.setAttribute('theme', 'dark');
+    document.documentElement.setAttribute('data-theme', 'dark');
     header.themeSwitch.style.backgroundPosition = 'center bottom -0.8rem';
   };
 
   const _lightTheme = () => {
     header.themeSwitch.setAttribute('aria-checked', 'true');
-    document.documentElement.setAttribute('theme', 'light');
+    document.documentElement.setAttribute('data-theme', 'light');
     header.themeSwitch.style.backgroundPosition = 'center top 2px';
   };
 
